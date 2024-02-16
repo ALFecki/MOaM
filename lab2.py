@@ -1,77 +1,69 @@
 import numpy as np
 
-def optimize_plan(A, c, B):
+
+def optimize_plan(A, c, B, x):
     m = len(B)
-    
-    # Шаг 1: Вычисление обратной матрицы
-    AB = A[:, B]
+
+    AB = A[:, np.array(B) - 1]  # Modify this line
+    print(AB)
     A_inv_B = np.linalg.inv(AB)
-    
+    print(A_inv_B)
+
     while True:
-        # Шаг 2: Формирование вектора cB
-        c_B = c[B]
-        
-        # Шаг 3: Вычисление вектора потенциалов
+        print(A_inv_B)
+
+        c_B = c[np.array(B) - 1]
+        print(c_B)
         u = np.dot(c_B, A_inv_B)
-        
-        # Шаг 4: Вычисление вектора оценок
+        print(u)
         delta = np.dot(u, A) - c
-        
-        # Шаг 5: Проверка условия оптимальности
+        print(delta)
         if np.all(delta >= 0):
-            # Текущий план является оптимальным
-            return delta, B
-        
-        # Шаг 6: Поиск первой отрицательной компоненты
-        j0 = np.where(delta < 0)[0][0]
-        
-        # Шаг 7: Вычисление вектора z
-        Aj0 = A[:, j0]
+            return delta, B, x
+
+        j0 = np.where(delta < 0)[0][0] + 1
+
+        Aj0 = A[:, j0 - 1]
         z = np.dot(A_inv_B, Aj0)
-        
-        # Шаг 8: Вычисление вектора theta
+
         theta = np.zeros(m)
         for i in range(m):
             if z[i] > 0:
-                theta[i] = delta[B[i]] / z[i]
+                theta[i] = x[B[i] - 1] / z[i]
             else:
                 theta[i] = np.inf
-        
-        # Шаг 9: Вычисление theta0
+
         theta0 = np.min(theta)
-        
-        # Шаг 10: Проверка условия неограниченности
+
         if np.isinf(theta0):
-            # Целевая функция неограничена
             return None
-        
-        # Шаг 11: Нахождение базисного индекса j*
-        j_star = np.argmin(theta)
-        
-        # Шаг 12: Замена базисного индекса
-        B[j_star] = j0
-        
-        # Шаг 13: Обновление компонентов плана x
-        x = np.zeros(len(c))
-        x[B] = theta0
+        min_ind = np.argmin(theta)
+        j_star = B[min_ind]
+
+        B[min_ind] = j0
+
+        # x = np.zeros(len(c))
+        x[j0 - 1] = theta0
         for i in range(m):
-            if i != j_star:
-                x[B[i]] = x[B[i]] - theta0 * z[i]
-        
-        # Обновление A_inv_B для следующей итерации
-        A_inv_B = np.linalg.inv(A[:, B])
+            if i != min_ind:
+                x[B[i] - 1] = x[B[i] - 1] - theta0 * z[i]
+        x[j_star - 1] = 0
+
+        A_inv_B = np.linalg.inv(A[:, np.array(B) - 1])
         print(B)
 
 
 A = np.array([[-1, 1, 1, 0, 0], [1, 0, 0, 1, 0], [0, 1, 0, 0, 1]])
-c = np.array([1, 1, 0, 0 ,0])
+c = np.array([1, 1, 0, 0, 0])
 B = [3, 4, 5]
+x = [0, 0, 1, 3, 2]
 
-result = optimize_plan(A, c, B)
+result = optimize_plan(A, c, B, x)
 if result is not None:
-    delta, B = result
+    delta, B, x = result
     print("Оптимальный план найден:")
     print("delta =", delta)
     print("B =", B)
+    print("x = ", x)
 else:
     print("Целевая функция неограничена.")
