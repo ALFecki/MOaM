@@ -4,7 +4,7 @@ import numpy as np
 def optimize_plan(A, c, B, x):
     m = len(B)
 
-    AB = A[:, np.array(B) - 1]  # Modify this line
+    AB = A[:, np.array(B) - 1]
     print(AB)
     A_inv_B = np.linalg.inv(AB)
     print(A_inv_B)
@@ -14,6 +14,7 @@ def optimize_plan(A, c, B, x):
 
         c_B = c[np.array(B) - 1]
         print(c_B)
+        # вектор потенциалов
         u = np.dot(c_B, A_inv_B)
         print(u)
         delta = np.dot(u, A) - c
@@ -42,7 +43,6 @@ def optimize_plan(A, c, B, x):
 
         B[min_ind] = j0
 
-        # x = np.zeros(len(c))
         x[j0 - 1] = theta0
         for i in range(m):
             if i != min_ind:
@@ -59,7 +59,7 @@ B = [3, 4, 5]
 x = [0, 0, 1, 3, 2]
 
 result = optimize_plan(A, c, B, x)
-if result is not None:
+if result:
     delta, B, x = result
     print("Оптимальный план найден:")
     print("delta =", delta)

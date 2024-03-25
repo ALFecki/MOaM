@@ -16,25 +16,25 @@ def dual_simplex_method(c, A, b, B):
         y = np.dot(cB, AB_inv)
 
         # Шаг 4
-        kappa = np.zeros(n)
-        kappa_B = np.dot(AB_inv, b)
+        k_arr = np.zeros(n)
+        k_arr_B = np.dot(AB_inv, b)
 
         index = 0
         for val in B:
-            kappa[val] = kappa_B[index]
+            k_arr[val] = k_arr_B[index]
             index += 1
 
         # Шаг 5
-        if np.all(np.array(kappa) >= 0):
+        if np.all(np.array(k_arr) >= 0):
             x = np.zeros(n)
-            x[B] = kappa_B
+            x[B] = k_arr_B
             return x
 
         # Шаг 6
         k = 0
-        j = np.argmin(kappa)
+        j = np.argmin(k_arr)
 
-        k = [val for val in kappa if val < 0].index(kappa[j])
+        k = [val for val in k_arr if val < 0].index(k_arr[j])
 
         # Шаг 7
         delta_y = AB_inv[k]
@@ -58,7 +58,7 @@ def dual_simplex_method(c, A, b, B):
         B[k] = j_0
 
 
-# Пример использования
+
 c = np.array([-4, -3, -7, 0, 0])
 A = np.array(
     [
@@ -67,7 +67,7 @@ A = np.array(
     ]
 )
 b = np.array([-1, -3 / 2])
-B = np.array([3, 4])  # Начальное множество базисных индексов
+B = np.array([3, 4]) 
 
 result = dual_simplex_method(c, A, b, B)
 print(result)
